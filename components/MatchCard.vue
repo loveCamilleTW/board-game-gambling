@@ -6,18 +6,18 @@
     >
       <div class="d-flex align-center justify-space-between">
         <div class="d-flex align-center">
-          <div class="text-h6 mr-4">{{ game.name }}</div>
+          <div class="text-h6 mr-4">{{ match.name }}</div>
           <div class="d-flex align-center">
             <v-icon size="small" class="mr-1">mdi-clock-outline</v-icon>
-            <span>{{ $dayjs(game.startTime).format('YYYY-MM-DD HH:mm') }}</span>
+            <span>{{ $dayjs(match.startTime).format('YYYY-MM-DD HH:mm') }}</span>
           </div>
         </div>
         
         <div class="d-flex align-center">
-          <v-chip :color="stateColor" class="mr-4">{{ game.state }}</v-chip>
+          <v-chip :color="stateColor" class="mr-4">{{ match.state }}</v-chip>
           <v-btn 
             :color="stateColor" 
-            :disabled="game.state !== 'OPEN'"
+            :disabled="match.state !== 'OPEN'"
             @click="joinGame"
           >
             {{ actionButtonText }}
@@ -26,9 +26,9 @@
       </div>
     </v-sheet>
 
-    <GameDialog
+    <MatchDialog
       :model-value="showDialog"
-      :game="game"
+      :match="match"
       @update:model-value="showDialog = $event"
       @confirm-bets="handleConfirmBets"
     />
@@ -37,14 +37,9 @@
 
 <script setup>
 const props = defineProps({
-  game: {
+  match: {
     type: Object,
     required: true,
-    validator: (game) => {
-      return ['id', 'name', 'state', 'startTime'].every(
-        prop => prop in game
-      )
-    }
   }
 })
 
@@ -56,16 +51,16 @@ const stateColors = {
   ENDING: 'error'
 }
 
-const stateColor = computed(() => stateColors[props.game.state] || 'grey')
+const stateColor = computed(() => stateColors[props.match.state] || 'grey')
 
 const cardStateClass = computed(() => ({
-  'bg-success-lighten-5': props.game.state === 'OPEN',
-  'bg-warning-lighten-5': props.game.state === 'CLOSED',
-  'bg-error-lighten-5': props.game.state === 'ENDING'
+  'bg-success-lighten-5': props.match.state === 'OPEN',
+  'bg-warning-lighten-5': props.match.state === 'CLOSED',
+  'bg-error-lighten-5': props.match.state === 'ENDING'
 }))
 
 const actionButtonText = computed(() => {
-  switch (props.game.state) {
+  switch (props.match.state) {
     case 'OPEN': return 'Place Bet'
     case 'CLOSED': return 'Betting Closed'
     case 'ENDING': return 'Game Ending'
@@ -74,7 +69,7 @@ const actionButtonText = computed(() => {
 })
 
 const joinGame = () => {
-  emit('join', props.game.id)
+  emit('join', props.match.id)
 }
 
 const showDialog = ref(false)
